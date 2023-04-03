@@ -19,8 +19,10 @@ class NationalParks:
         return self.locations
 
     def ParksInfo(self):
-        for idx, park in enumerate(self.locations):
+        for idx, park in enumerate(self.GetListParks()):
             self.GetParkInfo(idx, park["url"])
+        
+        return self.locations
 
     def GetParkInfo(self, index=0, url=""):
         wsPark = ws(url=url)
@@ -29,13 +31,14 @@ class NationalParks:
 
 ########################################
 if __name__ == "__main__":
+    myDb = db()
+    CollectNationalParks = True
 
-    myDb = db().get_database()
-    NP = NationalParks(url="https://www.nationalparks.nsw.gov.au", group="NSWNP")
-    NP.GetListParks()
-    NP.ParksInfo()
+    # National Parks
+    if CollectNationalParks:
+        NP = NationalParks(url="https://www.nationalparks.nsw.gov.au", group="NSWNP")
+        listParks = NP.ParksInfo()
+        myDb.insert_many("nationalparks", listParks, True)
+    else: print("Info: Skip National Parks")
 
-    
-
-    # print(NP.locations)
 

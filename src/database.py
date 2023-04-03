@@ -7,13 +7,20 @@ class Database:
         self.uri=config["URI"]
         self.db_name=config["DB_NAME"]
 
-    def get_database(self, database_name=self.db_name):
+    def get_database(self, database_name=""):
+        if not database_name: database_name = self.db_name
         client = MongoClient(self.uri)
+
         return client[database_name]
     
-    def get_collection(self, collection_name):
+    def get_collection(self, collection_name=""):
         return self.get_database()[collection_name]
+    
+    def insert_many(self, collection_name, docs, drop=False):
+        if drop: self.get_collection(collection_name).drop()
+        result = self.get_collection(collection_name).insert_many(docs)
+        print("Info: Inserted {} documents".format(len(result.inserted_ids)))
 
 if __name__ == "__main__":
     db = Database()
-    print(db.get_database())
+    db.insert_many("test",[{"name":"test"},{"name":"test2"}])
