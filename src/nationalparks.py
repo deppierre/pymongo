@@ -1,4 +1,5 @@
 from webscraper import WebScraper as ws
+from database import Database as db
 
 class NationalParks:
     def __init__(self, url="", group=""):
@@ -29,8 +30,12 @@ class NationalParks:
 ########################################
 if __name__ == "__main__":
 
+    myDb = db().get_database()
     NP = NationalParks(url="https://www.nationalparks.nsw.gov.au", group="NSWNP")
-    # NP.GetListParks()
-    # NP.ParksInfo()
+    NP.GetListParks()
+    NP.ParksInfo()
+
+    
 
     # print(NP.locations)
+

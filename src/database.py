@@ -7,9 +7,12 @@ class Database:
         self.uri=config["URI"]
         self.db_name=config["DB_NAME"]
 
-    def get_database(self):
+    def get_database(self, database_name=self.db_name):
         client = MongoClient(self.uri)
-        return client[self.db_name]
+        return client[database_name]
+    
+    def get_collection(self, collection_name):
+        return self.get_database()[collection_name]
 
 if __name__ == "__main__":
     db = Database()
