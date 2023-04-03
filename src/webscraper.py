@@ -6,17 +6,18 @@ class WebScraper:
         self.url = url
         self.group = group
         self.groups = {
-            "NSWNP": "https://www.nationalparks.nsw.gov.au/conservation-and-heritage/national-parks"
+            "NSWNP": "/conservation-and-heritage/national-parks"
         }
-        self.locations = []
         
         if not self.group and not self.url:
             raise Exception("You need to provide either an url or a group")
 
-        if self.group: 
-            self.url = self.groups[self.group]
+        if self.group and self.url: 
+            self.url = self.url + self.groups[self.group]
     
     def get_soup(self):
         page = requests.get(self.url)
-        if page.status_code == 200: return BeautifulSoup(page.content, 'html.parser')
+        if page.status_code == 200: 
+            print("Info: Souped HTML ({})".format(self.url))
+            return BeautifulSoup(page.content, 'html.parser')
         else: raise Exception("HTML Error")
