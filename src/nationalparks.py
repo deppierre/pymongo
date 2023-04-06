@@ -1,12 +1,12 @@
 from webscraper import WebScraper as ws
-from database import Database as db
 
 class NationalParks:
-    def __init__(self, url="", group=""):
+    def __init__(self, url="", group="", soup=True):
         self.locations = []
         self.group = group
         self.url = url
         self.wsGroup = ws(url = self.url, group=self.group)
+        self.soup = soup
 
     def GetListParks(self):
         if self.group == "NSWNP":
@@ -19,26 +19,24 @@ class NationalParks:
         return self.locations
 
     def ParksInfo(self):
-        for idx, park in enumerate(self.GetListParks()):
-            self.GetParkInfo(idx, park["url"])
-        
-        return self.locations
+        if self.soup:
+            for idx, park in enumerate(self.GetListParks()):
+                self.GetParkInfo(idx, park["url"])
+            
+            return self.locations
 
     def GetParkInfo(self, index=0, url=""):
         wsPark = ws(url=url)
         for element in wsPark.get_soup().find_all("div",{"class":"scrollingBox__item camping"}):
             self.locations[index]["campings"].append(self.url + element.a["href"].strip())
 
+    def GetCampingInfo(self, index=0, url=""):
+        wsCamping = ws(url=url)
+        for element in wsCamping.get_soup().find_all("div",{"class":"scrollingBox__item camping"}):
+            self.locations[index]["campings"].append(self.url + element.a["href"].strip())
+
 ########################################
 if __name__ == "__main__":
-    myDb = db()
-    CollectNationalParks = True
-
-    # National Parks
-    if CollectNationalParks:
-        NP = NationalParks(url="https://www.nationalparks.nsw.gov.au", group="NSWNP")
-        listParks = NP.ParksInfo()
-        myDb.insert_many("nationalparks", listParks, True)
-    else: print("Info: Skip National Parks")
+    print("Debug: National Parks module")
 
 

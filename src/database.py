@@ -17,9 +17,14 @@ class Database:
         return self.get_database()[collection_name]
     
     def insert_many(self, collection_name, docs, drop=False):
-        if drop: self.get_collection(collection_name).drop()
+        if drop: 
+            self.get_collection(collection_name).drop()
+            print("Info: Drop collection {}".format(collection_name))
         result = self.get_collection(collection_name).insert_many(docs)
         print("Info: Inserted {} documents".format(len(result.inserted_ids)))
+
+    def query_find(self, collection_name, query={}, projection={}):
+        return self.get_collection(collection_name).find(query, projection)
 
 if __name__ == "__main__":
     db = Database()
