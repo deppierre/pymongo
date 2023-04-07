@@ -21,6 +21,7 @@ class Database:
         if drop: 
             self.get_collection(collection_name).drop()
             print("Info: Drop collection {}".format(collection_name))
+            
         result = self.get_collection(collection_name).insert_many(docs)
         print("Info: Inserted {} documents".format(len(result.inserted_ids)))
 

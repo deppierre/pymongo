@@ -12,7 +12,7 @@ if listParks: myDb.insert_many("nationalparks", listParks, True)
 else: print("Info: Skip National Parks collection")
 
 # Campings
-camping_urls = myDb.agg("nationalparks",
+urls_pipeline = myDb.agg("nationalparks",
 [
     {
         "$group" : {
@@ -38,8 +38,7 @@ camping_urls = myDb.agg("nationalparks",
         }
     }
 ])
-camping_urls = camping_urls.next()["allurls"]
 
-for url in camping_urls: 
+for url in urls_pipeline.next()["allurls"]: 
     print("Info: {}".format(url))
     NP.GetCampingInfo(url)
