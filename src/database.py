@@ -14,7 +14,8 @@ class Database:
         return client[database_name]
     
     def get_collection(self, collection_name=""):
-        return self.get_database()[collection_name]
+        if collection_name: return self.get_database()[collection_name]
+        else: print("Error: Collection name is required")
     
     def insert_many(self, collection_name, docs, drop=False):
         if drop: 
@@ -23,8 +24,11 @@ class Database:
         result = self.get_collection(collection_name).insert_many(docs)
         print("Info: Inserted {} documents".format(len(result.inserted_ids)))
 
-    def query_find(self, collection_name, query={}, projection={}):
+    def query_find(self, collection_name="", query={}, projection={}):
         return self.get_collection(collection_name).find(query, projection)
+    
+    def agg(self, collection_name="", pipeline=[]):
+        return self.get_collection(collection_name).aggregate(pipeline)
 
 if __name__ == "__main__":
     db = Database()

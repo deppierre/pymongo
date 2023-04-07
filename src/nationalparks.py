@@ -18,22 +18,20 @@ class NationalParks:
                 })
         return self.locations
 
+    def GetParkInfo(self, index=0, url=""):
+        wsPark = ws(url=url)
+        for element in wsPark.get_soup().find_all("div",{"class":"scrollingBox__item camping"}):
+            self.locations[index]["campings"].append(self.url + element.a["href"].strip())
+
     def ParksInfo(self):
         if self.soup:
             for idx, park in enumerate(self.GetListParks()):
                 self.GetParkInfo(idx, park["url"])
             
             return self.locations
-
-    def GetParkInfo(self, index=0, url=""):
-        wsPark = ws(url=url)
-        for element in wsPark.get_soup().find_all("div",{"class":"scrollingBox__item camping"}):
-            self.locations[index]["campings"].append(self.url + element.a["href"].strip())
-
-    def GetCampingInfo(self, index=0, url=""):
-        wsCamping = ws(url=url)
-        for element in wsCamping.get_soup().find_all("div",{"class":"scrollingBox__item camping"}):
-            self.locations[index]["campings"].append(self.url + element.a["href"].strip())
+        
+    def GetCampingInfo(self, url=""):
+        pass
 
 ########################################
 if __name__ == "__main__":

@@ -9,7 +9,37 @@ NP = NP(url="https://www.nationalparks.nsw.gov.au", group="NSWNP", soup=False)
 listParks = NP.ParksInfo()
 
 if listParks: myDb.insert_many("nationalparks", listParks, True)
-else: print("Info: Skip National Parks")
+else: print("Info: Skip National Parks collection")
 
-campings = myDb.query_find("nationalparks", query="{ campings:{$ne:[]} }", projection="{ campings:1 }")
-print(campings)
+# Campings
+camping_urls = myDb.agg("nationalparks",
+[
+    {
+        "$group" : {
+            "_id" : None,
+            "campings": { "$push": "$campings" }
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "allurls": {
+                "$reduce": {
+                    "input": "$campings",
+                    "initialValue": [],
+                    "in": {
+                        "$concatArrays": [
+                            "$$value",
+                            "$$this" 
+                        ]
+                    }
+                }
+            }
+        }
+    }
+])
+camping_urls = camping_urls.next()["allurls"]
+
+for url in camping_urls: 
+    print("Info: {}".format(url))
+    NP.GetCampingInfo(url)
