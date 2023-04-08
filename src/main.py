@@ -40,5 +40,4 @@ urls_pipeline = myDb.agg("nationalparks",
 ])
 
 for url in urls_pipeline.next()["allurls"]: 
-    print("Info: {}".format(url))
     NP.GetCampingInfo(url)

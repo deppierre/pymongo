@@ -31,7 +31,23 @@ class NationalParks:
             return self.locations
         
     def GetCampingInfo(self, url=""):
-        pass
+        wsCamping = ws(url=url)
+        wsCampingMap = ws(url=url+"/visitor-info")
+
+        items = wsCamping.get_soup().find("table",{"class":"itemDetails"}).find_all("tr")
+        details = {}
+
+        for item in items:
+            rows = item.findChildren(['th', 'td'])
+            details[rows[0].get_text()] = rows[1].get_text().strip()
+
+        new_camping = {
+            "name": wsCamping.get_soup().find("h1",{"class":"show-inline"}).get_text().strip(),
+            "location": wsCamping.get_soup().find("p",{"class":"tabbedPageSubTitle"}).get_text().strip(),
+            "map_url": self.url + wsCampingMap.get_soup().find("li",{"class":"headingIcon icon pdf"}).a["href"],
+            "details": details
+        }
+        print(new_camping)
 
 ########################################
 if __name__ == "__main__":
