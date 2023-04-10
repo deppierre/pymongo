@@ -18,6 +18,5 @@ class WebScraper:
     def get_soup(self):
         page = requests.get(self.url)
         if page.status_code == 200: 
-            print("Info: Souped HTML ({})".format(self.url))
             return BeautifulSoup(page.content, 'html.parser')
         else: raise Exception("HTML Error")

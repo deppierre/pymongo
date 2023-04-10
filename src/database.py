@@ -9,9 +9,8 @@ class Database:
 
     def get_database(self, database_name=""):
         if not database_name: database_name = self.db_name
-        client = MongoClient(self.uri)
-
-        return client[database_name]
+        with MongoClient(self.uri) as client:
+            return client[database_name]
     
     def get_collection(self, collection_name=""):
         if collection_name: return self.get_database()[collection_name]
@@ -24,6 +23,16 @@ class Database:
             
         result = self.get_collection(collection_name).insert_many(docs)
         print("Info: Inserted {} documents".format(len(result.inserted_ids)))
+
+    def insert(self, collection_name, doc, replace=False, debug=False):
+        if debug: print("Debug: Inserting document: {}".format(doc))
+        if replace: 
+            result = self.get_collection(collection_name).replace_one({"name":doc["name"]}, doc, upsert=True)
+            if result.modified_count > 0: print("Info: Replaced {} document".format(result.modified_count))
+            if result.upserted_id: print("Info: Inserted 1 document")
+        else:
+            result = self.get_collection(collection_name).insert(doc)
+            print("Info: Inserted 1 document")
 
     def query_find(self, collection_name="", query={}, projection={}):
         return self.get_collection(collection_name).find(query, projection)

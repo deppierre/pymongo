@@ -1,5 +1,6 @@
 from nationalparks import NationalParks as NP
 from database import Database as db
+import asyncio
 
 # Database
 myDb = db()
@@ -39,5 +40,15 @@ urls_pipeline = myDb.agg("nationalparks",
     }
 ])
 
-for url in urls_pipeline.next()["allurls"]: 
-    NP.GetCampingInfo(url)
+urls = urls_pipeline.next()["allurls"]
+
+for url in urls:
+    Camping = NP.GetCampingInfo(url)
+
+    if Camping:
+        NP.available_campings.append(Camping)
+        print("Info: Progression {}/{} ({})".format(len(NP.available_campings),len(urls),Camping["name"]))
+
+if NP.available_campings: 
+    myDb.insert_many("nationalparks_campings", NP.available_campings, True)
+    print("Info: Rejected campings {}".format(NP.unavailable_campings))

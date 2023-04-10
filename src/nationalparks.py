@@ -7,6 +7,8 @@ class NationalParks:
         self.url = url
         self.wsGroup = ws(url = self.url, group=self.group)
         self.soup = soup
+        self.available_campings = []
+        self.unavailable_campings = []
 
     def GetListParks(self):
         if self.group == "NSWNP":
@@ -30,24 +32,43 @@ class NationalParks:
             
             return self.locations
         
-    def GetCampingInfo(self, url=""):
+    def GetCampingInfo(self, url="",debug=False):
+        if debug: print("Debug: GetCampingInfo(url={})".format(url))
+
         wsCamping = ws(url=url)
-        wsCampingMap = ws(url=url+"/visitor-info")
+        # wsCampingMap = ws(url=url+"/visitor-info")
+        new_camping = {}
 
-        items = wsCamping.get_soup().find("table",{"class":"itemDetails"}).find_all("tr")
-        details = {}
+        # if wsCampingMap:
+        #     new_camping["map_url"] = self.url + wsCampingMap.get_soup().find("li",{"class":"headingIcon icon pdf"}).a["href"]
+        # else:
+        #     new_camping["map_url"] = self.url + wsCamping.get_soup().find("li",{"class":"headingIcon icon pdf"}).a["href"]
 
-        for item in items:
-            rows = item.findChildren(['th', 'td'])
-            details[rows[0].get_text()] = rows[1].get_text().strip()
+        try:
+            new_camping["name"] = wsCamping.get_soup().find("h1",{"class":"show-inline"}).get_text().strip()
+            new_camping["location"] = wsCamping.get_soup().find("p",{"class":"tabbedPageSubTitle"}).get_text().strip()
+            new_camping["url"] = url
+            new_camping["status"] = "opened"
 
-        new_camping = {
-            "name": wsCamping.get_soup().find("h1",{"class":"show-inline"}).get_text().strip(),
-            "location": wsCamping.get_soup().find("p",{"class":"tabbedPageSubTitle"}).get_text().strip(),
-            "map_url": self.url + wsCampingMap.get_soup().find("li",{"class":"headingIcon icon pdf"}).a["href"],
-            "details": details
-        }
-        print(new_camping)
+            if not wsCamping.get_soup().find("p",{"class":"npws-status--closed-areas"}):
+                items = wsCamping.get_soup().find("table",{"class":"itemDetails"})
+                if items:
+                    details = {}
+                    for item in items.find_all("tr"):
+                        rows = item.findChildren(['th', 'td'])
+                        details[rows[0].get_text()] = rows[1].get_text().strip()
+                        new_camping["details"] = details
+            else:
+                new_camping["status"] = "closed"
+        except AttributeError as AE:
+            print("Info: This camping is not available (url={})\nError: {}".format(url,AE))
+            self.unavailable_campings.append(url)
+            return None
+        except:
+            print("Fatal: something else went wrong (url={})".format(url))
+            return None
+        else:
+            return new_camping
 
 ########################################
 if __name__ == "__main__":
