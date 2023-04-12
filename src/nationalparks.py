@@ -60,7 +60,7 @@ def GetCampingInfo(url="",debug=False):
         else:
             return new_camping
         
-def GetCampingDate(url, begin_date, end_date=None):
+def GetCampingDate(url, begin_date, end_date=None, debug=False):
 
     start_date = date(int(begin_date[:4]), int(begin_date[4:6]), int(begin_date[6:8]))
     end_date = start_date + timedelta(days=1)
@@ -73,6 +73,7 @@ def GetCampingDate(url, begin_date, end_date=None):
         mm_to = calendar.month_abbr[end_date.month],
         yy_to = end_date.strftime("%Y")
     )
+    if debug: print("Debug: GetCampingDate(url={})".format(_url))
     soup = ws.get_soup(_url)
 
     for element in soup.find_all("div",{"id":"availability"}):
